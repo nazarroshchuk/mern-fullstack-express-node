@@ -1,12 +1,15 @@
 import express from 'express';
 import cors from "cors"
 import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
 
 import placesRoutes from "./routes/places-routes.js";
 import usersRoutes from "./routes/users-routes.js";
 import HttpError from "./models/http-error.js";
+dotenv.config();
 
-const PORT = process.env.PORT || 4001;
+const PORT = process.env.PORT;
+const BASE_URL = process.env.API_BASE_URL;
 
 const appExpress = express();
 
@@ -17,8 +20,8 @@ appExpress.use(cors({
 
 // Middleware to parse JSON bodies
 appExpress.use(bodyParser.json());
-appExpress.use('/api/places',placesRoutes);
-appExpress.use('/api/users',usersRoutes);
+appExpress.use(`${BASE_URL}/places`, placesRoutes);
+appExpress.use(`${BASE_URL}/users`, usersRoutes);
 
 // Handle unsupported routes
 appExpress.use((req, res, next) => {

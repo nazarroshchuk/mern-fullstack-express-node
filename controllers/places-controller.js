@@ -1,5 +1,7 @@
 import HttpError from "../models/http-error.js";
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
+import {validationResult} from "express-validator";
+import {getCoordsForAddress} from "../utils/location.js";
 
 // Sample data for places
 const places = [
@@ -50,14 +52,27 @@ export const getPlacesByUserId  = (req, res, next) => {
     }
 }
 
-export const createPlace = (req, res, next) => {
-    const { title, description, coordinates, address, creator } = req.body;
+export const createPlace = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
+        res.status(400).json({errors: errors.array()});
+        next(new HttpError('Invalid inputs passed, please check your data.', 422));
+    }
+    const { title, description, address, creator } = req.body;
+    let location;
+
+    try {
+        location = await getCoordsForAddress(address);
+    } catch (error) {
+        return next(error);
+    }
 
     const createdPlace = {
         id: uuidv4(),
         title,
         description,
-        location: coordinates,
+        location,
         address,
         creator
     };
@@ -72,6 +87,13 @@ export const createPlace = (req, res, next) => {
 }
 
 export const updatePlace = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
+        res.status(400).json({errors: errors.array()});
+        return next(new HttpError('Invalid inputs passed, please check your data.', 422));
+    }
+
     const { title, description } = req.body;
     const placeId = req.params.pid;
 
