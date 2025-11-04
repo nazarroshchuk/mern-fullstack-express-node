@@ -10,23 +10,70 @@ A full-stack web application built with the MERN stack (MongoDB, Express.js, Rea
 - **Database**: MongoDB integration
 - **Frontend**: React application
 - **Development**: Hot reload with nodemon
+- **Code Quality**: ESLint and Prettier for consistent code formatting
+
+### External API
+
+- **Google Geocoding API** - [Geocoding API](https://developers.google.com/maps/documentation/geocoding/start]NoSQL) Convert addresses or Place IDs to latitude/longitude coordinates and vice-versa.
 
 ## NPM Libraries Used
 
 ### Dependencies
+
 - **express** (^5.1.0) - Fast, unopinionated, minimalist web framework for Node.js
 - **body-parser** (^2.2.0) - Node.js body parsing middleware for handling HTTP request bodies
 - **cors** (^2.8.5) - Express middleware to enable Cross-Origin Resource Sharing (CORS)
 - **express-validator** (^7.3.0) - Express middleware for server-side data validation and sanitization
-- **Axios** (^1.13.1) - Promise-based HTTP client for making requests to external APIs
-- **mongoose** (^7.3.1) - MongoDB object modeling tool designed to
+- **axios** (^1.13.1) - Promise-based HTTP client for making requests to external APIs
+- **dotenv** (^17.2.3) - Load environment variables from .env file
 
 ### Development Dependencies
+
 - **nodemon** (^3.1.10) - Development tool that automatically restarts the server when file changes are detected
 - **uuid** (^13.0.0) - Library for generating unique identifiers (UUIDs)
+- **eslint** (^9.39.1) - JavaScript linting tool for identifying and fixing code issues
+- **prettier** (^3.6.2) - Code formatter for consistent code style
+- **eslint-config-prettier** (^10.1.8) - Disables ESLint rules that conflict with Prettier
+- **eslint-plugin-prettier** (^5.5.4) - Runs Prettier as an ESLint rule
 
-### External API
-- **Google Geocoding API** - [Geocoding API](https://developers.google.com/maps/documentation/geocoding/start]NoSQL) Convert addresses or Place IDs to latitude/longitude coordinates and vice-versa.
+## Code Formatting & Quality
+
+This project uses ESLint and Prettier to maintain consistent code quality and formatting standards.
+
+### Configuration
+
+- **ESLint**: Configured with Node.js-specific rules and ES2022 support
+- **Prettier**: Single quotes, 2-space indentation, 100 character line width
+- **Integration**: ESLint and Prettier work together seamlessly
+
+### Available Scripts
+
+#### Development
+
+```bash
+     npm start          # Start development server with nodemon
+     npm run prod       # Start production server
+```
+
+#### Code Quality
+
+```bash
+    npm run lint       # Check for linting issues
+    npm run lint:fix   # Auto-fix linting issues
+    npm run format     # Format all files with Prettier
+    npm run format:check # Check if files are properly formatted
+    npm run lint:format # Run both linting and formatting
+```
+
+### Pre-commit Workflow
+
+Before committing code, run:
+
+```bash
+  npm run lint:format
+```
+
+This ensures your code follows the project's formatting standards.
 
 ## Getting Started
 
@@ -39,15 +86,20 @@ A full-stack web application built with the MERN stack (MongoDB, Express.js, Rea
 ### Installation
 
 1. Clone the repository:
+
 ```bash
     git clone git@github.com:nazarroshchuk/mern-fullstack-express-node.git
     cd mern-fullstack-express-node
 ```
+
 2. Install dependencies:
+
 ```bash
   npm install
 ```
+
 1. Start the development server:
+
 ```bash
   npm run dev
 ```
