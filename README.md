@@ -15,6 +15,7 @@ A full-stack web application built with the MERN stack (MongoDB, Express.js, Rea
 ### External API
 
 - **Google Geocoding API** - [Geocoding API](https://developers.google.com/maps/documentation/geocoding/start]NoSQL) Convert addresses or Place IDs to latitude/longitude coordinates and vice-versa.
+- **mongoose** - [mongoose](https://mongoosejs.com/) Elegant MongoDB object modeling for Node.js
 
 ## NPM Libraries Used
 

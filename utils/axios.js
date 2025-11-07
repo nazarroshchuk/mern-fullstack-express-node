@@ -1,7 +1,6 @@
-// utils/axios.js
 import axios from 'axios';
 
-// Create axios instance with default configuration
+// axios instance
 const apiAxios = axios.create({
   timeout: 10000, // 10 seconds timeout
   headers: {

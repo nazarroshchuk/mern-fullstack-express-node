@@ -1,43 +1,55 @@
-import { v4 as uuidv4 } from 'uuid';
+import HttpError, { getValidationExpressErrors } from '../models/http-error.js';
+import UserModel from '../models/user.js';
 
-import HttpError from '../models/http-error.js';
-import { validationResult } from 'express-validator';
+export const getUsers = async (req, res, next) => {
+  getValidationExpressErrors(req, res, next);
 
-// Sample data for places
-const users = [
-  { id: 'u1', name: 'John Doe', email: 'jon@mail.com', password: 'password123' },
-  { id: 'u2', name: 'Jane Smith', email: 'jane@mail.com', password: 'password123123' },
-];
-
-export const getUsers = (req, res) => {
-  res.json({ users });
+  try {
+    const users = await UserModel.find({}, '-password').exec();
+    res.json({ users: users || [] });
+  } catch (e) {
+    next(e || new HttpError(e.message, 500));
+  }
 };
 
-export const signup = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log(errors);
-    res.status(400).json({ errors: errors.array() });
-    return next(new HttpError('Invalid inputs passed, please check your data.', 422));
+export const signup = async (req, res, next) => {
+  getValidationExpressErrors(req, res, next);
+
+  const { name, email, password, places } = req.body;
+
+  try {
+    const existingUser = await UserModel.findOne({ email }).exec();
+    if (existingUser) {
+      return next(new HttpError('User exists already, please login instead.', 422));
+    }
+
+    const newUser = new UserModel({
+      name,
+      email,
+      password,
+      image: 'https://picsum.photos/200/300',
+      places: places || [],
+    });
+    await newUser.save();
+    res.status(201).json({ user: newUser.toObject({ getters: true }) });
+  } catch (e) {
+    return next(e || new HttpError('Signing up failed, please try again later.', 500));
   }
-
-  const { name, email, password } = req.body;
-
-  if (users.find(user => user.name === name && user.email === email)) {
-    throw new HttpError('User exists already, please login instead.', 422);
-  }
-
-  const newUser = { id: uuidv4(), name, email, password };
-  users.push(newUser);
-  res.status(201).json({ user: newUser });
 };
 
-export const login = (req, res) => {
+export const login = async (req, res, next) => {
+  getValidationExpressErrors(req, res, next);
+
   const { email, password } = req.body;
-  const user = users.find(u => u.email === email);
-  if (!user || user.password !== password) {
-    throw new HttpError('Invalid credentials', 401);
-  }
 
-  return res.status(201).json({ user });
+  try {
+    const user = await UserModel.findOne({ email });
+    if (!user || user.password !== password) {
+      return next(new HttpError('Invalid credentials, could not log you in.', 401));
+    }
+
+    return res.status(201).json({ user: user.toObject({ getters: true }) });
+  } catch (e) {
+    return next(e || new HttpError('Invalid credentials, could not log you in.', 500));
+  }
 };

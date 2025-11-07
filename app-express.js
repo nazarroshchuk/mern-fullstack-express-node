@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import placesRoutes from './routes/places-routes.js';
 import usersRoutes from './routes/users-routes.js';
 import HttpError from './models/http-error.js';
+import clientMongoose from './utils/mongoose.js';
 dotenv.config();
 
 const PORT = process.env.PORT;
@@ -22,6 +23,7 @@ appExpress.use(
 
 // Middleware to parse JSON bodies
 appExpress.use(bodyParser.json());
+
 appExpress.use(`${BASE_URL}/places`, placesRoutes);
 appExpress.use(`${BASE_URL}/users`, usersRoutes);
 
@@ -41,16 +43,19 @@ appExpress.use((error, req, res, next) => {
 });
 
 // Start the server
-appExpress
-  .listen(PORT, () => {
-    console.log(`🚀 Express server running on http://localhost:${PORT}`);
-  })
-  .on('error', err => {
-    if (err.code === 'EADDRINUSE') {
-      console.error(`❌ Port ${PORT} is already in use. Please try a different port.`);
-      process.exit(1);
-    } else {
-      console.error('❌ Server error:', err);
-      process.exit(1);
-    }
-  });
+const expressListener = () =>
+  appExpress
+    .listen(PORT, () => {
+      console.log(`🚀 Express server running on http://localhost:${PORT}`);
+    })
+    .on('error', err => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} is already in use. Please try a different port.`);
+        process.exit(1);
+      } else {
+        console.error('❌ Server error:', err);
+        process.exit(1);
+      }
+    });
+
+clientMongoose(expressListener);
