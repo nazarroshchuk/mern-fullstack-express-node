@@ -11,15 +11,28 @@ dotenv.config();
 
 const PORT = process.env.PORT;
 const BASE_URL = process.env.API_BASE_URL;
+const CORS_ORIGIN = process.env.CORS_ORIGIN;
 
 const appExpress = express();
 
-appExpress.use(
-  cors({
-    origin: `http://localhost:${PORT}`,
-    credentials: true,
-  })
-);
+// appExpress.use(
+//   cors({
+//     origin: CORS_ORIGIN,
+//     credentials: true,
+//   })
+// );
+
+//CORS middleware
+appExpress.use(cors({ origin: CORS_ORIGIN, credentials: true }));
+
+appExpress.use((req, res, next) => {
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+  next();
+});
 
 // Middleware to parse JSON bodies
 appExpress.use(bodyParser.json());

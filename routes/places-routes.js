@@ -1,13 +1,10 @@
 import express from 'express';
 import { check } from 'express-validator';
-
 import { placesController } from '../controllers/intex.js';
-
 const placesRouter = express.Router();
-
 // places API routes
-placesRouter.get('/:pid', placesController.getPlaceById);
 placesRouter.get('/user/:uid', placesController.getPlacesByUserId);
+placesRouter.get('/:pid', placesController.getPlaceById);
 placesRouter.post(
   '/',
   [
@@ -23,5 +20,4 @@ placesRouter.patch(
   placesController.updatePlace
 );
 placesRouter.delete('/:pid', placesController.deletePlace);
-
 export default placesRouter;

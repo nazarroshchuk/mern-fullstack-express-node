@@ -6,7 +6,7 @@ export const getUsers = async (req, res, next) => {
 
   try {
     const users = await UserModel.find({}, '-password').exec();
-    res.json({ users: users || [] });
+    res.json({ users: users.map(user => user.toObject({ getters: true })) || [] });
   } catch (e) {
     next(e || new HttpError(e.message, 500));
   }
@@ -27,7 +27,7 @@ export const signup = async (req, res, next) => {
       name,
       email,
       password,
-      image: 'https://picsum.photos/200/300',
+      image: 'https://picsum.photos/200/200',
       places: places || [],
     });
     await newUser.save();
