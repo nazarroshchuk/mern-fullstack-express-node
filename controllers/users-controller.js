@@ -1,5 +1,8 @@
 import HttpError, { getValidationExpressErrors } from '../models/http-error.js';
 import UserModel from '../models/user.js';
+import fileUpload from '../middleware/file-upload.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const getUsers = async (req, res, next) => {
   getValidationExpressErrors(req, res, next);
@@ -15,7 +18,7 @@ export const getUsers = async (req, res, next) => {
 export const signup = async (req, res, next) => {
   getValidationExpressErrors(req, res, next);
 
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     const existingUser = await UserModel.findOne({ email }).exec();
@@ -27,8 +30,8 @@ export const signup = async (req, res, next) => {
       name,
       email,
       password,
-      image: 'https://picsum.photos/200/200',
-      places: places || [],
+      image: `${req.file.path}`,
+      places: [],
     });
     await newUser.save();
     res.status(201).json({ user: newUser.toObject({ getters: true }) });
