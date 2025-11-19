@@ -1,6 +1,5 @@
 import HttpError, { getValidationExpressErrors } from '../models/http-error.js';
 import UserModel from '../models/user.js';
-import fileUpload from '../middleware/file-upload.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -30,7 +29,7 @@ export const signup = async (req, res, next) => {
       name,
       email,
       password,
-      image: `${req.file.path}`,
+      image: req.file.path,
       places: [],
     });
     await newUser.save();
