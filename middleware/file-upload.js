@@ -1,5 +1,7 @@
 import multer from 'multer';
 import { v4 as uuidV4 } from 'uuid';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import HttpError from '../models/http-error.js';
 
 const MIME_TYPE_MAP = {
@@ -9,17 +11,27 @@ const MIME_TYPE_MAP = {
   'image/webp': 'webp',
 };
 
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+
+// Configure Cloudinary storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'places-images', // folder name in Cloudinary
+    allowed_formats: ['jpeg', 'jpg', 'png', 'webp'],
+    name: (req, file) => `${uuidV4()}.${MIME_TYPE_MAP[file.mimetype]}`,
+  },
+});
+
 export const fileUserImageUpload = multer({
   limits: { fileSize: 500000 }, // 500 KB limit
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, 'uploads/images');
-    },
-    filename: (req, file, cb) => {
-      const extname = MIME_TYPE_MAP[file.mimetype];
-      cb(null, `${uuidV4()}.${extname}`);
-    },
-  }),
+  storage: storage,
   fileFilter: (req, file, cb) => {
     const isValid = !!MIME_TYPE_MAP[file.mimetype];
     const error = isValid
@@ -31,15 +43,7 @@ export const fileUserImageUpload = multer({
 
 export const filePlaceImageUpload = multer({
   limits: { fileSize: 1000000 }, // 1 MB limit
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, 'uploads/images');
-    },
-    filename: (req, file, cb) => {
-      const extname = MIME_TYPE_MAP[file.mimetype];
-      cb(null, `${uuidV4()}.${extname}`);
-    },
-  }),
+  storage: storage,
   fileFilter: (req, file, cb) => {
     const isValid = !!MIME_TYPE_MAP[file.mimetype];
     const error = isValid

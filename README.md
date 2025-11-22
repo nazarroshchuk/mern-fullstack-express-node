@@ -2,14 +2,14 @@
 
 # MERN Fullstack Express Node Backend
 
-A backend API server built with Express.js and Node.js, featuring MongoDB integration, JWT authentication, file uploads, and Google Places API integration.
+A backend API server built with Express.js and Node.js, featuring MongoDB integration, JWT authentication, Cloudinary file uploads, and Google Places API integration.
 
 ## Features
 
 - **Backend**: Express.js server with Node.js (ES Modules)
 - **Database**: MongoDB integration with Mongoose ODM
 - **Authentication**: JWT-based user authentication with bcryptjs password hashing
-- **File Uploads**: Image upload handling with Multer
+- **File Uploads**: Cloud-based image upload handling with Cloudinary and Multer
 - **API Integration**: Google Places API for geocoding
 - **Validation**: Server-side data validation with express-validator
 - **CORS**: Cross-Origin Resource Sharing enabled
@@ -20,6 +20,42 @@ A backend API server built with Express.js and Node.js, featuring MongoDB integr
 
 - **Google Places API** - [Places API Documentation](https://developers.google.com/maps/documentation/places/web-service) - Convert addresses to coordinates and vice-versa
 - **MongoDB Atlas** - [MongoDB Atlas](https://www.mongodb.com/atlas) - Cloud-hosted MongoDB database
+- **Cloudinary** - [Cloudinary Documentation](https://cloudinary.com/documentation) - Cloud-based image and video management service
+
+### Cloud Storage with Cloudinary
+
+This project uses **Cloudinary** for persistent file storage, which is essential for Heroku deployment since Heroku's filesystem is ephemeral.
+
+#### Why Cloudinary?
+
+- ✅ **Persistent Storage**: Files survive server restarts (unlike local filesystem on Heroku)
+- ✅ **CDN Delivery**: Fast global image delivery
+- ✅ **Image Optimization**: Automatic format conversion and compression
+- ✅ **Transformations**: Real-time image resizing and cropping
+- ✅ **Free Tier**: 25GB storage and 25GB monthly bandwidth
+
+### Cloudinary Setup
+
+1. **Create Account**: Sign up at [cloudinary.com](https://cloudinary.com)
+2. **Get Credentials**: Copy from your [Cloudinary Dashboard](https://cloudinary.com/console):
+   - Cloud Name
+   - API Key
+   - API Secret
+3. **View Uploaded Images**: Access [Media Library](https://cloudinary.com/console/media_library)
+
+### Image Storage Structure
+
+Images are organized in Cloudinary folders:
+- **places-images/**: Place photos uploaded by users
+- **user-images/**: User profile pictures (if implemented)
+
+### File Upload Configuration
+
+The project handles two types of uploads:
+- **Place Images**: Up to 1MB, stored in `places-images/` folder
+- **User Images**: Up to 500KB, stored in `places-images/` folder
+
+Supported formats: PNG, JPEG, JPG, WEBP
 
 ## NPM Libraries Used
 
@@ -35,6 +71,8 @@ A backend API server built with Express.js and Node.js, featuring MongoDB integr
 - **jsonwebtoken** (^9.0.2) - JSON Web Token implementation for authentication
 - **bcryptjs** (^3.0.3) - Library for hashing passwords
 - **multer** (^2.0.2) - Middleware for handling multipart/form-data (file uploads)
+- **cloudinary** (latest) - Cloud-based image and video management service
+- **multer-storage-cloudinary** (latest) - Multer storage engine for Cloudinary
 - **uuid** (^13.0.0) - Library for generating unique identifiers (UUIDs)
 - **dotenv** (^17.2.3) - Loads environment variables from .env file
 
@@ -114,7 +152,24 @@ API_BASE_URL=/api
 
 # Google Places API
 GOOGLE_PLACES_API_KEY=your-google-places-api-key
+
+# Cloudinary Configuration (Required for file uploads)
+CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-api-key
+CLOUDINARY_API_SECRET=your-cloudinary-api-secret
 ```
+
+### Cloudinary Environment Variables
+
+**Required for file uploads to work:**
+
+1. **CLOUDINARY_CLOUD_NAME**: Your Cloudinary cloud name (found in dashboard)
+2. **CLOUDINARY_API_KEY**: Your API key for authentication
+3. **CLOUDINARY_API_SECRET**: Your API secret for secure operations
+
+**How to get these values:**
+1. Go to [Cloudinary Console](https://cloudinary.com/console)
+2. Copy values from the "Account Details" section on your dashboard
 
 ## API Endpoints
 
@@ -137,6 +192,7 @@ GOOGLE_PLACES_API_KEY=your-google-places-api-key
 - Node.js (v18 or higher)
 - MongoDB Atlas account or local MongoDB installation
 - Google Places API key
+- **Cloudinary account** (required for file uploads)
 
 ### Installation
 
@@ -157,10 +213,15 @@ GOOGLE_PLACES_API_KEY=your-google-places-api-key
 
 ```bash
 cp .env.example .env
-# Edit .env with your actual values
+# Edit .env with your actual values including Cloudinary credentials
 ```
 
-4. Start the development server:
+4. **Set up Cloudinary** (Important):
+   - Create account at [cloudinary.com](https://cloudinary.com)
+   - Copy your Cloud Name, API Key, and API Secret to `.env`
+   - Without these, file uploads will fail
+
+5. Start the development server:
 
 ```bash
     npm run start:nodemon
@@ -170,15 +231,24 @@ The server will start on `http://localhost:5000`
 
 ## Deployment
 
-### Heroku Deployment
+### Heroku Deployment with Cloudinary
 
 The app is deployed on Heroku and accessible at:
 **https://mern-places-f3d73c0860e7.herokuapp.com/**
 
+#### Important: Cloudinary is Required for Heroku
+
+Heroku's filesystem is ephemeral, so local file storage won't work. Cloudinary is essential for production deployment.
+
 #### Deploy from GitHub (Recommended)
 1. Connect your GitHub repository to Heroku
-2. Enable automatic deployments from your main branch
-3. Set environment variables in Heroku dashboard
+2. **Set Cloudinary environment variables in Heroku:**
+   ```bash
+   heroku config:set CLOUDINARY_CLOUD_NAME=your-cloud-name
+   heroku config:set CLOUDINARY_API_KEY=your-api-key
+   heroku config:set CLOUDINARY_API_SECRET=your-api-secret
+   ```
+3. Enable automatic deployments from your main branch
 
 #### Manual Deployment via CLI
 
@@ -192,14 +262,24 @@ heroku login
 # Create Heroku app (if not exists)
 heroku create your-app-name
 
-# Set environment variables
+# Set environment variables (including Cloudinary)
 heroku config:set MONGODB_URI=your-mongodb-uri
 heroku config:set JWT_SECRET=your-jwt-secret
-# ... set other environment variables
+heroku config:set CLOUDINARY_CLOUD_NAME=your-cloud-name
+heroku config:set CLOUDINARY_API_KEY=your-api-key
+heroku config:set CLOUDINARY_API_SECRET=your-api-secret
+heroku config:set GOOGLE_PLACES_API_KEY=your-google-api-key
 
 # Deploy
 git push heroku main
 ```
+
+### Verifying Cloudinary Setup
+
+After deployment, test file uploads:
+1. Try uploading an image through your API
+2. Check Cloudinary Media Library for uploaded files
+3. Verify image URLs are accessible
 
 ## Project Structure
 

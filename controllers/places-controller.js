@@ -3,7 +3,15 @@ import HttpError, { getValidationExpressErrors } from '../models/http-error.js';
 import { getCoordsForAddress } from '../utils/location.js';
 import mongoose from 'mongoose';
 import UserModel from '../models/user.js';
-import fs from 'fs';
+import { v2 as cloudinary } from 'cloudinary';
+
+// Helper function to extract public_id from Cloudinary URL
+const getPublicIdFromUrl = (url) => {
+  if (!url) return null;
+  const parts = url.split('/');
+  const filename = parts[parts.length - 1];
+  return `places-images/${filename.split('.')[0]}`;
+};
 
 export const getPlaceById = async (req, res, next) => {
   const id = req.params.pid;
@@ -110,9 +118,14 @@ export const updatePlace = async (req, res, next) => {
     await place.save();
 
     if (req.file && previousImage) {
-      fs.unlink(previousImage, err => {
-        console.log(err);
-      });
+      const publicId = getPublicIdFromUrl(previousImage);
+      if (publicId) {
+        try {
+          await cloudinary.uploader.destroy(publicId);
+        } catch (cloudinaryError) {
+          console.error('Failed to delete previous image from Cloudinary:', cloudinaryError);
+        }
+      }
     }
 
     res.status(200).json({ place: place.toObject({ getters: true }) });
@@ -136,7 +149,9 @@ export const deletePlace = async (req, res, next) => {
       return next(new HttpError(`Could not find a place for the provided id: ${placeId}.`, 404));
     }
 
-    if (place.creator.toString() !== req.userData.userId) {
+    console.log(place.creator.id,);
+
+    if (place.creator.id !== req.userData.userId) {
       return next(new HttpError('You are not allowed to delete this place.', 401));
     }
 
@@ -147,9 +162,15 @@ export const deletePlace = async (req, res, next) => {
 
     await session.commitTransaction();
 
-    fs.unlink(imagePath, err => {
-      console.log(err);
-    });
+    // Delete image from Cloudinary
+    const publicId = getPublicIdFromUrl(imagePath);
+    if (publicId) {
+      try {
+        await cloudinary.uploader.destroy(publicId);
+      } catch (cloudinaryError) {
+        console.error('Failed to delete image from Cloudinary:', cloudinaryError);
+      }
+    }
 
     res.status(200).json({ message: 'Deleted place.' });
   } catch (e) {
