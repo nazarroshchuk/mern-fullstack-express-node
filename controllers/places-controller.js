@@ -40,7 +40,7 @@ export const getPlacesByUserId = async (req, res, next) => {
 export const createPlace = async (req, res, next) => {
   getValidationExpressErrors(req, res, next);
 
-  const { title, description, address, creator } = req.body;
+  const { title, description, address } = req.body;
   let location;
 
   try {
@@ -55,11 +55,11 @@ export const createPlace = async (req, res, next) => {
       description,
       location,
       address,
-      creator,
+      creator: req.userData.userId,
       image: req.file.path,
     });
 
-    const user = await UserModel.findById(creator);
+    const user = await UserModel.findById(req.userData.userId);
     if (!user) {
       return next(new HttpError('Could not find user for provided id.', 404));
     }
@@ -95,15 +95,26 @@ export const updatePlace = async (req, res, next) => {
     if (!place) {
       return next(new HttpError('Could not find a place for the provided id.', 404));
     }
+
+    if (place.creator.toString() !== req.userData.userId) {
+      return next(new HttpError('You are not allowed to edit this place.', 401));
+    }
+
     place.title = title;
     place.description = description;
-    place.image = req.file.path;
+
+    if (req.file) {
+      place.image = req.file.path;
+    }
 
     await place.save();
 
-    fs.unlink(previousImage, err => {
-      console.log(err);
-    });
+    if (req.file && previousImage) {
+      fs.unlink(previousImage, err => {
+        console.log(err);
+      });
+    }
+
     res.status(200).json({ place: place.toObject({ getters: true }) });
   } catch (e) {
     return next(e || new HttpError('Something went wrong, could not update place.', 500));
@@ -123,6 +134,10 @@ export const deletePlace = async (req, res, next) => {
 
     if (!place) {
       return next(new HttpError(`Could not find a place for the provided id: ${placeId}.`, 404));
+    }
+
+    if (place.creator.toString() !== req.userData.userId) {
+      return next(new HttpError('You are not allowed to delete this place.', 401));
     }
 
     place.creator.places.pull(place);
