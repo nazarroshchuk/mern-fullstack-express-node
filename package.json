@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app-express.js",
+    "start:nodemon": "nodemon app-express.js",
     "prod": "NODE_ENV=production node app-express.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
