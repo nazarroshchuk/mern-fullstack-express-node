@@ -4,8 +4,6 @@ import jwt from 'jsonwebtoken';
 import HttpError, { getValidationExpressErrors } from '../models/http-error.js';
 import UserModel from '../models/user.js';
 
-
-
 export const getUsers = async (req, res, next) => {
   getValidationExpressErrors(req, res, next);
 

@@ -1,8 +1,10 @@
 import multer from 'multer';
 import { v4 as uuidV4 } from 'uuid';
-import { v2 as cloudinary } from 'cloudinary';
+import cloudinary from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import HttpError from '../models/http-error.js';
+
+const cloudinaryV2 = cloudinary.v2;
 
 const MIME_TYPE_MAP = {
   'image/png': 'png',
@@ -12,16 +14,15 @@ const MIME_TYPE_MAP = {
 };
 
 // Configure Cloudinary
-cloudinary.config({
+cloudinaryV2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-
 // Configure Cloudinary storage
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+  cloudinary: cloudinaryV2,
   params: {
     folder: 'places-images', // folder name in Cloudinary
     allowed_formats: ['jpeg', 'jpg', 'png', 'webp'],

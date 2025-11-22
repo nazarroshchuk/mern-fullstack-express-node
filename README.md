@@ -24,9 +24,36 @@ A backend API server built with Express.js and Node.js, featuring MongoDB integr
 
 ### Cloud Storage with Cloudinary
 
-This project uses **Cloudinary** for persistent file storage, which is essential for Heroku deployment since Heroku's filesystem is ephemeral.
+This project uses **Cloudinary v1.41.3** for persistent file storage, which is essential for Heroku deployment since Heroku's filesystem is ephemeral.
 
-#### Why Cloudinary?
+### Version Compatibility
+
+The project uses Cloudinary v1.41.3 (not v2) due to compatibility requirements with `multer-storage-cloudinary@4.0.0`. This ensures:
+
+- ✅ **Stable Integration**: No dependency conflicts during deployment
+- ✅ **Reliable Uploads**: Proven compatibility between Cloudinary and Multer storage
+- ✅ **Heroku Deployment**: No build errors during npm install
+
+### Implementation Details
+
+The Cloudinary integration uses the v2 API accessed through the v1 package:
+
+```javascript
+import cloudinary from 'cloudinary';
+const cloudinaryV2 = cloudinary.v2;
+
+// Configuration
+cloudinaryV2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Usage for image deletion
+await cloudinaryV2.uploader.destroy(publicId);
+```
+
+### Why Cloudinary?
 
 - ✅ **Persistent Storage**: Files survive server restarts (unlike local filesystem on Heroku)
 - ✅ **CDN Delivery**: Fast global image delivery
@@ -46,12 +73,14 @@ This project uses **Cloudinary** for persistent file storage, which is essential
 ### Image Storage Structure
 
 Images are organized in Cloudinary folders:
+
 - **places-images/**: Place photos uploaded by users
 - **user-images/**: User profile pictures (if implemented)
 
 ### File Upload Configuration
 
 The project handles two types of uploads:
+
 - **Place Images**: Up to 1MB, stored in `places-images/` folder
 - **User Images**: Up to 500KB, stored in `places-images/` folder
 
@@ -71,8 +100,8 @@ Supported formats: PNG, JPEG, JPG, WEBP
 - **jsonwebtoken** (^9.0.2) - JSON Web Token implementation for authentication
 - **bcryptjs** (^3.0.3) - Library for hashing passwords
 - **multer** (^2.0.2) - Middleware for handling multipart/form-data (file uploads)
-- **cloudinary** (latest) - Cloud-based image and video management service
-- **multer-storage-cloudinary** (latest) - Multer storage engine for Cloudinary
+- **cloudinary** (^1.41.3) - Cloud-based image and video management service (v1 for compatibility)
+- **multer-storage-cloudinary** (^4.0.0) - Multer storage engine for Cloudinary
 - **uuid** (^13.0.0) - Library for generating unique identifiers (UUIDs)
 - **dotenv** (^17.2.3) - Loads environment variables from .env file
 
@@ -168,12 +197,14 @@ CLOUDINARY_API_SECRET=your-cloudinary-api-secret
 3. **CLOUDINARY_API_SECRET**: Your API secret for secure operations
 
 **How to get these values:**
+
 1. Go to [Cloudinary Console](https://cloudinary.com/console)
 2. Copy values from the "Account Details" section on your dashboard
 
 ## API Endpoints
 
 ### Places
+
 - `GET /api/places/user/:uid` - Get places by user ID
 - `GET /api/places/:pid` - Get place by place ID
 - `POST /api/places` - Create new place (requires authentication)
@@ -181,6 +212,7 @@ CLOUDINARY_API_SECRET=your-cloudinary-api-secret
 - `DELETE /api/places/:pid` - Delete place (requires authentication)
 
 ### Users
+
 - `GET /api/users` - Get all users
 - `POST /api/users/signup` - Register new user
 - `POST /api/users/login` - User login
@@ -241,6 +273,7 @@ The app is deployed on Heroku and accessible at:
 Heroku's filesystem is ephemeral, so local file storage won't work. Cloudinary is essential for production deployment.
 
 #### Deploy from GitHub (Recommended)
+
 1. Connect your GitHub repository to Heroku
 2. **Set Cloudinary environment variables in Heroku:**
    ```bash
@@ -277,6 +310,7 @@ git push heroku main
 ### Verifying Cloudinary Setup
 
 After deployment, test file uploads:
+
 1. Try uploading an image through your API
 2. Check Cloudinary Media Library for uploaded files
 3. Verify image URLs are accessible

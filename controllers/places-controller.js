@@ -3,10 +3,12 @@ import HttpError, { getValidationExpressErrors } from '../models/http-error.js';
 import { getCoordsForAddress } from '../utils/location.js';
 import mongoose from 'mongoose';
 import UserModel from '../models/user.js';
-import { v2 as cloudinary } from 'cloudinary';
+import cloudinary from 'cloudinary';
+
+const cloudinaryV2 = cloudinary.v2;
 
 // Helper function to extract public_id from Cloudinary URL
-const getPublicIdFromUrl = (url) => {
+const getPublicIdFromUrl = url => {
   if (!url) return null;
   const parts = url.split('/');
   const filename = parts[parts.length - 1];
@@ -121,7 +123,7 @@ export const updatePlace = async (req, res, next) => {
       const publicId = getPublicIdFromUrl(previousImage);
       if (publicId) {
         try {
-          await cloudinary.uploader.destroy(publicId);
+          await cloudinaryV2.uploader.destroy(publicId);
         } catch (cloudinaryError) {
           console.error('Failed to delete previous image from Cloudinary:', cloudinaryError);
         }
@@ -149,7 +151,7 @@ export const deletePlace = async (req, res, next) => {
       return next(new HttpError(`Could not find a place for the provided id: ${placeId}.`, 404));
     }
 
-    console.log(place.creator.id,);
+    console.log(place.creator.id);
 
     if (place.creator.id !== req.userData.userId) {
       return next(new HttpError('You are not allowed to delete this place.', 401));
@@ -166,7 +168,7 @@ export const deletePlace = async (req, res, next) => {
     const publicId = getPublicIdFromUrl(imagePath);
     if (publicId) {
       try {
-        await cloudinary.uploader.destroy(publicId);
+        await cloudinaryV2.uploader.destroy(publicId);
       } catch (cloudinaryError) {
         console.error('Failed to delete image from Cloudinary:', cloudinaryError);
       }
