@@ -1,14 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
 
 import placesRoutes from './routes/places-routes.js';
 import usersRoutes from './routes/users-routes.js';
 import HttpError from './models/http-error.js';
 import clientMongoose from './utils/mongoose.js';
 import fs from 'fs';
-dotenv.config();
 
 const PORT = process.env.PORT || 4001; // Hiroku provides its own port via env variable after deployment
 const BASE_URL = process.env.API_BASE_URL;

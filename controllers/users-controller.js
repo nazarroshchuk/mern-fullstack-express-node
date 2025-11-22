@@ -3,9 +3,8 @@ import jwt from 'jsonwebtoken';
 
 import HttpError, { getValidationExpressErrors } from '../models/http-error.js';
 import UserModel from '../models/user.js';
-import dotenv from 'dotenv';
 
-dotenv.config();
+
 
 export const getUsers = async (req, res, next) => {
   getValidationExpressErrors(req, res, next);

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app-express.js",
-    "start:nodemon": "nodemon app-express.js",
+    "start:nodemon": "nodemon --env-file=.env app-express.js",
     "prod": "NODE_ENV=production node app-express.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -28,7 +28,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.20.0",
     "mongoose": "^8.19.3",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -36,7 +37,6 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "nodemon": "^3.1.10",
-    "prettier": "^3.6.2",
-    "uuid": "^13.0.0"
+    "prettier": "^3.6.2"
   }
 }
