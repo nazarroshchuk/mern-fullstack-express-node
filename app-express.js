@@ -10,7 +10,7 @@ import clientMongoose from './utils/mongoose.js';
 import fs from 'fs';
 dotenv.config();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4001; // Hiroku provides its own port via env variable after deployment
 const BASE_URL = process.env.API_BASE_URL;
 const CORS_ORIGIN = process.env.CORS_ORIGIN;
 

@@ -104,3 +104,28 @@ This ensures your code follows the project's formatting standards.
 ```bash
   npm run dev
 ```
+
+### DEPLOYMENT
+
+1. #### App is deployed from Github repo and is accessible at:
+   https://mern-places-f3d73c0860e7.herokuapp.com/
+
+2. #### (Optional) Build the application for production using terminal and local Git repo:
+
+```bash
+  npm run build
+
+```bash
+  brew install heroku/brew/heroku
+```
+```bash
+ heroku login
+```
+heroku: Press any key to open up the browser to login or q to exit
+›   Warning: If browser does not open, visit
+›   https://cli-auth.heroku.com/auth/browser/***
+heroku: Waiting for login...
+Logging in... done
+Logged in as me@example.com
+
+
