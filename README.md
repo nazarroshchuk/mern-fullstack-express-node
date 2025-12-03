@@ -24,15 +24,14 @@ A backend API server built with Express.js and Node.js, featuring MongoDB integr
 
 ### Cloud Storage with Cloudinary
 
-This project uses **Cloudinary v1.41.3** for persistent file storage, which is essential for Heroku deployment since Heroku's filesystem is ephemeral.
+This project uses **Cloudinary v1.41.3** for persistent file storage, which is essential for production deployment since cloud platforms typically have ephemeral filesystems.
 
 ### Version Compatibility
 
 The project uses Cloudinary v1.41.3 (not v2) due to compatibility requirements with `multer-storage-cloudinary@4.0.0`. This ensures:
-
 - ✅ **Stable Integration**: No dependency conflicts during deployment
 - ✅ **Reliable Uploads**: Proven compatibility between Cloudinary and Multer storage
-- ✅ **Heroku Deployment**: No build errors during npm install
+- ✅ **Production Deployment**: No build errors during npm install
 
 ### Implementation Details
 
@@ -55,7 +54,7 @@ await cloudinaryV2.uploader.destroy(publicId);
 
 ### Why Cloudinary?
 
-- ✅ **Persistent Storage**: Files survive server restarts (unlike local filesystem on Heroku)
+- ✅ **Persistent Storage**: Files survive server restarts (unlike local filesystem on cloud platforms)
 - ✅ **CDN Delivery**: Fast global image delivery
 - ✅ **Image Optimization**: Automatic format conversion and compression
 - ✅ **Transformations**: Real-time image resizing and cropping
@@ -73,14 +72,12 @@ await cloudinaryV2.uploader.destroy(publicId);
 ### Image Storage Structure
 
 Images are organized in Cloudinary folders:
-
 - **places-images/**: Place photos uploaded by users
 - **user-images/**: User profile pictures (if implemented)
 
 ### File Upload Configuration
 
 The project handles two types of uploads:
-
 - **Place Images**: Up to 1MB, stored in `places-images/` folder
 - **User Images**: Up to 500KB, stored in `places-images/` folder
 
@@ -197,14 +194,12 @@ CLOUDINARY_API_SECRET=your-cloudinary-api-secret
 3. **CLOUDINARY_API_SECRET**: Your API secret for secure operations
 
 **How to get these values:**
-
 1. Go to [Cloudinary Console](https://cloudinary.com/console)
 2. Copy values from the "Account Details" section on your dashboard
 
 ## API Endpoints
 
 ### Places
-
 - `GET /api/places/user/:uid` - Get places by user ID
 - `GET /api/places/:pid` - Get place by place ID
 - `POST /api/places` - Create new place (requires authentication)
@@ -212,7 +207,6 @@ CLOUDINARY_API_SECRET=your-cloudinary-api-secret
 - `DELETE /api/places/:pid` - Delete place (requires authentication)
 
 ### Users
-
 - `GET /api/users` - Get all users
 - `POST /api/users/signup` - Register new user
 - `POST /api/users/login` - User login
@@ -263,54 +257,52 @@ The server will start on `http://localhost:5000`
 
 ## Deployment
 
-### Heroku Deployment with Cloudinary
+### Render Deployment with Cloudinary
 
-The app is deployed on Heroku and accessible at:
-**https://mern-places-f3d73c0860e7.herokuapp.com/**
+The backend API is deployed on Render, a modern cloud platform that provides:
+- **Automatic deployments** from GitHub
+- **Environment variable management**
+- **Persistent file storage** via Cloudinary integration
+- **Custom domain support**
 
-#### Important: Cloudinary is Required for Heroku
+#### Important: Cloudinary is Required for Production
 
-Heroku's filesystem is ephemeral, so local file storage won't work. Cloudinary is essential for production deployment.
+Cloud platforms typically have ephemeral filesystems, so local file storage won't work in production. Cloudinary provides persistent cloud storage essential for deployed applications.
 
-#### Deploy from GitHub (Recommended)
+#### Deploy to Render
 
-1. Connect your GitHub repository to Heroku
-2. **Set Cloudinary environment variables in Heroku:**
-   ```bash
-   heroku config:set CLOUDINARY_CLOUD_NAME=your-cloud-name
-   heroku config:set CLOUDINARY_API_KEY=your-api-key
-   heroku config:set CLOUDINARY_API_SECRET=your-api-secret
+1. **Create Render Account**: Sign up at [render.com](https://render.com)
+2. **Connect GitHub Repository**: 
+   - Go to [Render Dashboard](https://dashboard.render.com/)
+   - Click "New +" → "Web Service"
+   - Connect your GitHub repository
+3. **Configure Build Settings**:
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Node Version**: 18 or higher
+4. **Set Environment Variables** in Render Dashboard:
    ```
-3. Enable automatic deployments from your main branch
+   MONGODB_URI=your-mongodb-uri
+   JWT_SECRET=your-jwt-secret
+   CLOUDINARY_CLOUD_NAME=your-cloud-name
+   CLOUDINARY_API_KEY=your-api-key
+   CLOUDINARY_API_SECRET=your-api-secret
+   GOOGLE_PLACES_API_KEY=your-google-api-key
+   NODE_ENV=production
+   ```
+5. **Deploy**: Render will automatically deploy your application
 
-#### Manual Deployment via CLI
+#### Render Benefits
 
-```bash
-# Install Heroku CLI
-brew install heroku/brew/heroku
-
-# Login to Heroku
-heroku login
-
-# Create Heroku app (if not exists)
-heroku create your-app-name
-
-# Set environment variables (including Cloudinary)
-heroku config:set MONGODB_URI=your-mongodb-uri
-heroku config:set JWT_SECRET=your-jwt-secret
-heroku config:set CLOUDINARY_CLOUD_NAME=your-cloud-name
-heroku config:set CLOUDINARY_API_KEY=your-api-key
-heroku config:set CLOUDINARY_API_SECRET=your-api-secret
-heroku config:set GOOGLE_PLACES_API_KEY=your-google-api-key
-
-# Deploy
-git push heroku main
-```
+- ✅ **Free Tier Available**: Perfect for development and testing
+- ✅ **Automatic SSL**: HTTPS enabled by default
+- ✅ **Git Integration**: Auto-deploy on push to main branch
+- ✅ **Zero Downtime Deploys**: Smooth deployment process
+- ✅ **Health Checks**: Automatic service monitoring
 
 ### Verifying Cloudinary Setup
 
 After deployment, test file uploads:
-
 1. Try uploading an image through your API
 2. Check Cloudinary Media Library for uploaded files
 3. Verify image URLs are accessible
